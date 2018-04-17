@@ -10,7 +10,7 @@ else
 endif
 
 docker_build:
-	@docker build \
+	@docker build --no-cache\
 	  --build-arg VCS_REF=`git rev-parse --short HEAD` \
 	  --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
 	  -t $(DOCKER_IMAGE):$(DOCKER_TAG) .
@@ -23,6 +23,7 @@ test:
 	docker run $(DOCKER_IMAGE):$(DOCKER_TAG) version --client
 
 test_k8s:
+	@kubectl delete job kubectl-test --namespace gitlab
 	@printf 'apiVersion: batch/v1\n\
 kind: Job\n\
 metadata:\n\
@@ -33,7 +34,8 @@ spec:\n\
     spec:\n\
       containers:\n\
       - name: k8s-kubectl\n\
-        image: v20100/k8s-kubectl\n\
+        image: v20100/k8s-kubectl:master\n\
+        imagePullPolicy: Always\n\
         command: ["kubectl","get", "pods"]\n\
       restartPolicy: Never\n\
-' | kubectl replace -f -
+' | kubectl create -f -
