@@ -1,15 +1,20 @@
 default: docker_build
 
-DOCKER_IMAGE ?= v20100/k8s-kubectl
-GIT_BRANCH ?= `git rev-parse --abbrev-ref HEAD`
-
-ifeq ($(GIT_BRANCH), master)
+DOCKER_IMAGE = v20100/k8s-kubectl
+GIT_BRANCH = $$(git rev-parse --abbrev-ref HEAD)
+# DOCKER_TAG = latest
+# ifneq ($(GIT_BRANCH),"master")
+# 	DOCKER_TAG = $(GIT_BRANCH)
+# endif
+ifneq ($(GIT_BRANCH),master)
 	DOCKER_TAG = latest
 else
 	DOCKER_TAG = $(GIT_BRANCH)
 endif
 
 docker_build:
+	@echo $(GIT_BRANCH)
+	@echo $(DOCKER_IMAGE):$(DOCKER_TAG)
 	@docker build --no-cache\
 	  --build-arg VCS_REF=`git rev-parse --short HEAD` \
 	  --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
