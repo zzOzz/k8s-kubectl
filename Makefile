@@ -36,4 +36,4 @@ spec:\n\
         image: v20100/k8s-kubectl\n\
         command: ["kubectl","get", "pods"]\n\
       restartPolicy: Never\n\
-' | kubectl create -f -
+' | kubectl replace -f -
